@@ -23,7 +23,14 @@ def create_Graph(s1, s2, s3, path):
     for edge in s2:
         u = dic[int(edge[0])]
         v = dic[int(edge[1])]
-        if u == int(s3[0][1]) or v == int(s3[0][1]) or u == int(s3[1][1]) or v == int(s3[1][1]) or u == v:
+        if u == v:
+            continue
+        flag = 0
+        for x in s3:
+            if x[1] == u or x[1] == v:
+                flag = 1
+                break
+        if flag:
             continue
         if mp[u][v] == 0:
             g[u].append(v)
@@ -47,10 +54,10 @@ def work(st, path):
     if len(s2) == 0:
         return
     # 找到函数出口行号
-    s3 = re.findall("(\d+).*?METHOD.*?<SUB>(\d+)", st)
-    if len(s3) == 0:
+    s3 = re.findall("(\d+).*?\(METHOD.*?<SUB>(\d+)", st)
+    if len(s3) == 0 or len(s3) > 2:
         return
-    print(s3)
+    # print(s3)
     # 字典存编号行号对应关系
     create_Graph(s1, s2, s3, path)
 
@@ -61,11 +68,11 @@ def scan(path):
     for f in files:
         fs = open(path + '/dot/' + f, 'r', encoding='UTF-8')
         s = fs.read()
-        print(f)
         # 抽取并修改不合法行
         ss = re.findall("\"(\d+)\".*?\)>.*?\n", s)
         for x in ss:
             s = s.replace('\"'+x+'\"', 'w')
+        # print(f)
         work(s, path)
 
 
@@ -86,5 +93,8 @@ for ff in tqdm(file):
     # 建立行边集
     if not os.path.exists(source_dir + '/' + ff + '/edgelist.txt'):
         scan(source_dir + '/' + ff)
-        break
+        if not os.path.exists(source_dir + '/' + ff + '/edgelist.txt'):
+            shutil.rmtree(source_dir + '/' + ff)
+
+
 
