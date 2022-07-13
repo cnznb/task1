@@ -64,40 +64,57 @@ def work(st, path, idx):
 
 def scan(path):
     # 从本地读入文件
-    files = os.listdir(path+'/dot')
-    i = 0
+    ffs = os.listdir(path)
+    sss = list()
+    for x in ffs:
+        if x.endswith('methods.txt'):
+            fs = open(path + '/' + x, 'r', encoding='UTF-8')
+            ss = fs.read()
+            sss = re.findall(".* (\d+) (\d+)\n", ss)
+            fs.close()
+            break
+    mine = list()
+    for x in ffs:
+        if x.endswith('_del_lines.txt'):
+            fs = open(path + '/' + x, 'r', encoding='UTF-8')
+            xq = fs.read()
+            # del_line
+            xqq = re.findall("(\d+) .*?\n", xq)
+            fs.close()
+            for xx in xqq:
+                z = int(xx)
+                for oo in sss:
+                    if int(oo[0]) <= z <= int(oo[1]):
+                        if len(mine) == 0:
+                            mine.append(oo)
+                        elif mine[-1] != oo:
+                            mine.append(oo)
+                        break
+    files = os.listdir(path + '/edge')
     for f in files:
-        fs = open(path + '/dot/' + f, 'r', encoding='UTF-8')
-        s = fs.read()
-        # 抽取并修改不合法行
-        ss = re.findall("\"(\d+)\".*?\)>.*?\n", s)
-        for x in ss:
-            s = s.replace('\"'+x+'\"', 'w')
-        # print(f)
-        work(s, path, i)
-        i = i + 1
-
-
-def delete_empty_dot(path):
-    if not os.path.exists(path+'/dot'):
-        shutil.rmtree(path)
-        return
-    if len(os.listdir(path+'/dot')) == 0:
-        shutil.rmtree(path)
+        fxs = open(path + '/edge/' + f, 'r', encoding='UTF-8')
+        xs = fxs.read()
+        xss = re.findall('(\d+) (\d+)\n', xs)
+        fxs.close()
+        q = 0
+        for inn in xss:
+            if q == 1:
+                break
+            x = int(inn[0])
+            y = int(inn[1])
+            for xqq in mine:
+                if int(xqq[0]) <= x <= int(xqq[1]) or int(xqq[0]) <= y <= int(xqq[1]):
+                    q = 1
+                    break
+        if q == 0:
+            os.remove(path+'/edge/'+f)
 
 
 source_dir = 'E:/sets'
 file = os.listdir(source_dir)
 for ff in tqdm(file):
-    # 删除dot文件为空的或者不存在dot文件的脏数据
-    # delete_empty_dot(source_dir+'/'+ff)
-    # print(source_dir + '/' + ff)
     # 建立行边集
-    if not os.path.exists(source_dir + '/' + ff + '/edge'):
-        os.mkdir(source_dir + '/' + ff + '/edge')
-        scan(source_dir + '/' + ff)
-        if not os.path.exists(source_dir + '/' + ff + '/edge'):
-            shutil.rmtree(source_dir + '/' + ff)
+    scan(source_dir + '/' + ff)
 
 
 

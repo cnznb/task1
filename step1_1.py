@@ -7,9 +7,9 @@ import os
 import shutil
 from tqdm import tqdm
 # 数据集本地路径
-path = "E:/dataset"
+path = "E:/datasets"
 # 规范输出路径
-to = "F:/DataSet"
+to = "E:/sets"
 
 
 def work(file_path):
@@ -17,13 +17,13 @@ def work(file_path):
     for f in files:
         fs = f.split('.')
         fss = fs[0].split('_')
-        if len(fs) != 2 or len(fss) < 2:
+        if len(fs) != 2 or len(fss) < 2 or fs[0][0] == '_' or len(fss) > 3:
             continue
         if not os.path.exists(to + '/' + fss[0]):
             os.makedirs(to + '/' + fss[0])
         if fss[-1] == 'old':
             shutil.copyfile(file_path + '/' + f, to + '/' + fss[0] + '/' + fs[0] + '.java')
-        elif fss[-2] == 'del':
+        elif fss[-2] == 'del' or fss[-1] == 'methods' or fss[-1] == 'new':
             shutil.copyfile(file_path + '/' + f, to + '/' + fss[0] + '/' + f)
         # 行号是否需要单独提取放置一个文件中？
 
